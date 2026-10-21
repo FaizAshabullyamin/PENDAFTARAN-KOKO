@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pendaftaran Kokurikulum Sekolah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .step-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-amber-50/40 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Header dengan Tema Warna Maroon & Yellow -->
+    <header class="bg-red-950 text-white shadow-lg border-b-4 border-yellow-400">
+        <div class="max-w-4xl mx-auto px-4 py-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-red-900 border border-yellow-500/40 rounded-xl shadow-inner">
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-yellow-300">Pendaftaran Kokurikulum Tingkatan 1 2027</h1>
+                    <p class="text-xs text-amber-200/90 font-medium">SMK Taman Desa Jaya</p>
+                </div>
+            </div>
+            <button onclick="toggleModal('scriptModal')" class="hidden sm:flex items-center gap-1.5 text-xs bg-red-900 hover:bg-red-800 text-yellow-300 px-3 py-2 rounded-lg transition border border-yellow-500/40 font-medium">
+                <svg class="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Panduan Google Sheets
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-3xl w-full mx-auto p-4 sm:p-6 my-6">
+        <div class="bg-white rounded-2xl shadow-xl border border-amber-200/60 overflow-hidden">
+            
+            <!-- Progress Bar / Indicator Maroon & Yellow -->
+            <div class="bg-amber-100/60 px-6 py-4 border-b border-amber-200/70">
+                <div class="flex items-center justify-between max-w-xs mx-auto">
+                    <div class="flex items-center space-x-2">
+                        <div id="step1-indicator" class="w-8 h-8 rounded-full bg-red-900 text-yellow-300 font-bold flex items-center justify-center text-sm shadow border border-yellow-500/50">1</div>
+                        <span class="text-xs font-bold text-red-950">Maklumat Pelajar</span>
+                    </div>
+                    <div class="h-1 bg-amber-200 flex-1 mx-4 rounded"></div>
+                    <div class="flex items-center space-x-2">
+                        <div id="step2-indicator" class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm">2</div>
+                        <span class="text-xs font-semibold text-slate-500" id="step2-text">Pilihan Koko</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="kokoForm" class="p-6 sm:p-8">
+                
+                <div id="step1" class="step-transition space-y-6">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h2 class="text-lg font-bold text-red-950">Langkah 1: Maklumat Peribadi</h2>
+                        <p class="text-xs text-slate-500">Sila masukkan nama penuh, No. IC dan kelas anda terlebih dahulu.</p>
+                    </div>
+
+                    <div>
+                        <label for="nama" class="block text-sm font-semibold text-slate-700 mb-1">Nama Penuh Pelajar <span class="text-red-600">*</span></label>
+                        <input type="text" id="nama" required placeholder="Contoh: MUHAMMAD AMIR BIN ROSLI" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-800 focus:border-red-800 outline-none transition text-sm">
+                    </div>
+
+                    <div>
+                        <label for="noIc" class="block text-sm font-semibold text-slate-700 mb-1">No. Kad Pengenalan / IC <span class="text-red-600">*</span></label>
+                        <input type="text" id="noIc" required placeholder="Contoh: 140101015543 (Tanpa ' - ')" maxlength="12" pattern="[0-9]*" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-800 focus:border-red-800 outline-none transition text-sm">
+                    </div>
+
+                    <div>
+                        <label for="kelas" class="block text-sm font-semibold text-slate-700 mb-1">Kelas <span class="text-red-600">*</span></label>
+                        <select id="kelas" required onchange="handleClassChange()" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-800 focus:border-red-800 outline-none transition text-sm bg-white">
+                            <option value="" disabled selected>-- Sila Pilih Kelas --</option>
+                            <option value="1 Terampil">1 Terampil</option>
+                            <option value="1 Dinamik">1 Dinamik</option>
+                            <option value="1 Efisien">1 Efisien</option>
+                            <option value="1 Jauhari">1 Jauhari</option>
+                            <option value="1 Aspirasi">1 Aspirasi</option>
+                            <option value="1 Proaktif">1 Proaktif</option>
+                            <option value="1 Ibnu Khaldun">1 Ibnu Khaldun</option>
+                            <option value="1 Ibnu Sina">1 Ibnu Sina</option>
+                        </select>
+                    </div>
+
+                    <!-- Auto Notice for Special Classes -->
+                    <div id="specialClassNotice" class="hidden p-4 bg-amber-50 border border-yellow-400 rounded-xl text-amber-900 text-xs flex items-start gap-2 shadow-sm">
+                        <svg class="w-5 h-5 text-amber-700 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            <span class="font-bold">Maklumat Khas Kelas:</span> Murid dari kelas <span id="specialClassName" class="font-bold underline"></span> ditetapkan automatik menyertai <strong>Kelab Pendidikan Islam</strong>.
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-end">
+                        <button type="button" onclick="goToStep2()" class="w-full sm:w-auto px-6 py-3 bg-red-900 hover:bg-red-950 text-yellow-300 font-bold rounded-xl shadow-lg shadow-red-900/20 border border-yellow-500/30 transition flex items-center justify-center gap-2">
+                            Seterusnya
+                            <svg class="w-4 h-4 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="step2" class="step-transition space-y-6 hidden">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <div>
+                            <h2 class="text-lg font-bold text-red-950">Langkah 2: Pilihan Unit Kokurikulum</h2>
+                            <p class="text-xs text-slate-500">Pilih 1 unit bagi setiap kategori. Had 3 pelajar sahaja bagi setiap unit.</p>
+                        </div>
+                    </div>
+
+                    <!-- Student Summary Card -->
+                    <div class="bg-amber-50/70 p-3.5 rounded-xl border border-yellow-300 text-xs grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div><span class="text-slate-600">Nama:</span> <strong id="summaryNama" class="text-slate-900"></strong></div>
+                        <div><span class="text-slate-600">No. IC:</span> <strong id="summaryIc" class="text-slate-900"></strong></div>
+                        <div><span class="text-slate-600">Kelas:</span> <strong id="summaryKelas" class="text-red-900 font-bold"></strong></div>
+                    </div>
+
+                    <!-- 1. Badan Beruniform -->
+                    <div>
+                        <label for="badanBeruniform" class="block text-sm font-semibold text-slate-700 mb-1">1. Badan Beruniform <span class="text-red-600">*</span></label>
+                        <select id="badanBeruniform" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-800 focus:border-red-800 outline-none transition text-sm bg-white">
+                            <option value="" disabled selected>-- Pilih Badan Beruniform --</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. Kelab dan Persatuan -->
+                    <div>
+                        <label for="kelabPersatuan" class="block text-sm font-semibold text-slate-700 mb-1">
+                            2. Kelab & Persatuan <span class="text-red-600">*</span>
+                        </label>
+                        <select id="kelabPersatuan" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-800 focus:border-red-800 outline-none transition text-sm bg-white">
+                            <option value="" disabled selected>-- Pilih Kelab & Persatuan --</option>
+                        </select>
+                        <p id="kelabAutoNote" class="text-xs text-amber-800 mt-1.5 hidden font-semibold flex items-center gap-1">
+                            <span class="inline-block w-2 h-2 rounded-full bg-yellow-500"></span> Kelab telah ditetapkan secara automatik mengikut kelas anda.
+                        </p>
+                    </div>
+
+                    <!-- 3. Sukan dan Permainan -->
+                    <div>
+                        <label for="sukanPermainan" class="block text-sm font-semibold text-slate-700 mb-1">3. Sukan & Permainan <span class="text-red-600">*</span></label>
+                        <select id="sukanPermainan" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-800 focus:border-red-800 outline-none transition text-sm bg-white">
+                            <option value="" disabled selected>-- Pilih Sukan & Permainan --</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-4 flex flex-col sm:flex-row justify-between gap-3">
+                        <button type="button" onclick="goToStep1()" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Kembali
+                        </button>
+                        <button type="submit" id="submitBtn" class="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-red-950 font-bold rounded-xl shadow-lg shadow-yellow-500/20 border border-yellow-600 transition flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Hantar Pendaftaran
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-amber-200/70">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-red-950 text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    Status Kuota Semasa (Maksimum 3 Pelajar / Unit)
+                </h3>
+                <button onclick="resetData()" class="text-xs text-red-700 hover:underline">Reset Data Tempatan</button>
+            </div>
+            <div id="quotaContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                <!-- Dynamic Quota Status Generated Here -->
+            </div>
+        </div>
+    </main>
+
+    <div id="scriptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-lg font-bold text-red-950">Panduan Google Sheets & Kolum</h3>
+                <button onclick="toggleModal('scriptModal')" class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+            </div>
+            
+            <div class="space-y-4 text-xs text-slate-600">
+                <p>Susunan tajuk kolum di **Baris 1 Google Sheet** anda:</p>
+                
+                <div class="bg-amber-50 p-3 rounded-lg border border-yellow-300">
+                    <h4 class="font-bold text-red-950 mb-1">1. Nama Kolum Google Sheets (Baris 1)</h4>
+                    <div class="grid grid-cols-2 gap-1 font-mono bg-white p-2 rounded border border-amber-200 text-slate-800">
+                        <div>A: Masa Pendaftaran</div>
+                        <div>B: Nama Pelajar</div>
+                        <div>C: No IC</div>
+                        <div>D: Kelas</div>
+                        <div>E: Badan Beruniform</div>
+                        <div>F: Kelab Persatuan</div>
+                        <div>G: Sukan Permainan</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-slate-800 mb-1">2. Google Apps Script Code (Dikemas kini)</h4>
+                    <p class="mb-2">Gunakan kod di bawah dalam Extensions -> Apps Script di Google Sheets anda:</p>
+                    <pre class="bg-slate-900 text-yellow-400 p-3 rounded-lg font-mono overflow-x-auto text-[11px]">
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  
+  sheet.appendRow([
+    new Date(),
+    data.nama,
+    "'" + data.noIc, // tanda ' elak format nombor automatik hilang
+    data.kelas,
+    data.badanBeruniform,
+    data.kelabPersatuan,
+    data.sukanPermainan
+  ]);
+  
+  return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
+                       .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+                </div>
+            </div>
+
+            <div class="mt-6 text-right">
+                <button onclick="toggleModal('scriptModal')" class="px-4 py-2 bg-red-900 text-yellow-300 font-bold text-xs rounded-lg hover:bg-red-950">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-amber-200/60 py-4 text-center text-xs text-slate-500">
+        <p>© 2027 SMK Taman Desa Jaya - Sistem Pendaftaran Kokurikulum Tingkatan 1.</p>
+    </footer>
+
+    <script>
+        // --- DATA STRUCTURES ---
+        const BADAN_BERUNIFORM = [
+            "Kadet Polis", "Kadet Remaja Sekolah", "Pengakap", 
+            "St John Ambulance", "Kadet Bomba", "Pandu Puteri", 
+            "Puteri Islam", "BSMM"
+        ];
+
+        const KELAB_PERSATUAN = [
+            "Bahasa Melayu", "Bahasa Inggeris", "Pendidikan Islam", 
+            "STEM", "Sejara, Geografi dan rukun negara", "Pusat sumber dan media", 
+            "Kebudayaan dan keseniaan", "Bimbingan dan kerjaya", "Pencegahan Jenayah"
+        ];
+
+        const SUKAN_PERMAINAN = [
+            "Olahraga", "Bola Keranjang", "Bola Jaring", "Badminton", 
+            "Bola Sepak", "Ragbi", "Catur", "Bola Baling", "Silat"
+        ];
+
+        const LIMIT_PER_UNIT = 3;
+        
+        // Updated Google Apps Script Deployed URL (Maroon & Yellow Edition)
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpUeiLa32aaRPficip12_HHa_CmgDkUlfgo5rWGB8hb_DyfhnlQZhitn3WqmAoY38/exec"; 
+
+        // State variables
+        let registrations = JSON.parse(localStorage.getItem("koko_registrations")) || [];
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            renderQuotaOverview();
+        };
+
+        // --- STEP NAVIGATION LOGIC ---
+        function goToStep2() {
+            const nama = document.getElementById("nama").value.trim();
+            const noIc = document.getElementById("noIc").value.trim();
+            const kelas = document.getElementById("kelas").value;
+
+            if (!nama) {
+                Swal.fire({ icon: 'warning', title: 'Sila Masukkan Nama', text: 'Sila isi nama penuh pelajar.', confirmColor: '#7f1d1d' });
+                return;
+            }
+
+            if (!noIc || noIc.length < 12) {
+                Swal.fire({ icon: 'warning', title: 'No. IC Tidak Lengkap', text: 'Sila masukkan 12 digit nombor Kad Pengenalan tanpa tanda dash (-).', confirmColor: '#7f1d1d' });
+                return;
+            }
+
+            if (!kelas) {
+                Swal.fire({ icon: 'warning', title: 'Sila Pilih Kelas', text: 'Sila pilih kelas pelajar daripada senarai.', confirmColor: '#7f1d1d' });
+                return;
+            }
+
+            // Update UI indicators
+            document.getElementById("step1").classList.add("hidden");
+            document.getElementById("step2").classList.remove("hidden");
+            
+            document.getElementById("step1-indicator").classList.replace("bg-red-900", "bg-emerald-600");
+            document.getElementById("step1-indicator").classList.replace("text-yellow-300", "text-white");
+            document.getElementById("step1-indicator").innerHTML = "✓";
+            
+            document.getElementById("step2-indicator").classList.replace("bg-slate-200", "bg-red-900");
+            document.getElementById("step2-indicator").classList.replace("text-slate-500", "text-yellow-300");
+            document.getElementById("step2-text").classList.replace("text-slate-500", "text-red-950");
+            document.getElementById("step2-text").classList.add("font-bold");
+
+            // Update Step 2 Summary Card
+            document.getElementById("summaryNama").innerText = nama;
+            document.getElementById("summaryIc").innerText = noIc;
+            document.getElementById("summaryKelas").innerText = kelas;
+
+            // Populate Dropdowns based on Quotas & Special Class Rule
+            populateDropdowns(kelas);
+        }
+
+        function goToStep1() {
+            document.getElementById("step2").classList.add("hidden");
+            document.getElementById("step1").classList.remove("hidden");
+
+            document.getElementById("step1-indicator").classList.replace("bg-emerald-600", "bg-red-900");
+            document.getElementById("step1-indicator").classList.replace("text-white", "text-yellow-300");
+            document.getElementById("step1-indicator").innerHTML = "1";
+
+            document.getElementById("step2-indicator").classList.replace("bg-red-900", "bg-slate-200");
+            document.getElementById("step2-indicator").classList.replace("text-yellow-300", "text-slate-500");
+            document.getElementById("step2-text").classList.replace("text-red-950", "text-slate-500");
+            document.getElementById("step2-text").classList.remove("font-bold");
+        }
+
+        // --- SPECIAL CLASS RULE HANDLING ---
+        function handleClassChange() {
+            const kelas = document.getElementById("kelas").value;
+            const notice = document.getElementById("specialClassNotice");
+            const noticeName = document.getElementById("specialClassName");
+
+            if (kelas === "1 Ibnu Khaldun" || kelas === "1 Ibnu Sina") {
+                noticeName.innerText = kelas;
+                notice.classList.remove("hidden");
+            } else {
+                notice.classList.add("hidden");
+            }
+        }
+
+        // --- DROPDOWN POPULATION WITH QUOTA CONTROL ---
+        function populateDropdowns(selectedClass) {
+            const counts = getUnitCounts();
+
+            // 1. Badan Beruniform
+            const bbSelect = document.getElementById("badanBeruniform");
+            bbSelect.innerHTML = '<option value="" disabled selected>-- Pilih Badan Beruniform --</option>';
+            BADAN_BERUNIFORM.forEach(item => {
+                const current = counts.badanBeruniform[item] || 0;
+                const isFull = current >= LIMIT_PER_UNIT;
+                const opt = document.createElement("option");
+                opt.value = item;
+                opt.textContent = `${item} (${current}/${LIMIT_PER_UNIT})${isFull ? ' - PENUH' : ''}`;
+                opt.disabled = isFull;
+                bbSelect.appendChild(opt);
+            });
+
+            // 2. Kelab dan Persatuan (With special condition)
+            const kpSelect = document.getElementById("kelabPersatuan");
+            const autoNote = document.getElementById("kelabAutoNote");
+            kpSelect.innerHTML = '<option value="" disabled selected>-- Pilih Kelab & Persatuan --</option>';
+
+            if (selectedClass === "1 Ibnu Khaldun" || selectedClass === "1 Ibnu Sina") {
+                const opt = document.createElement("option");
+                opt.value = "Pendidikan Islam";
+                opt.textContent = "Pendidikan Islam (Ditetapkan Khas)";
+                opt.selected = true;
+                kpSelect.appendChild(opt);
+                kpSelect.disabled = true;
+                autoNote.classList.remove("hidden");
+            } else {
+                kpSelect.disabled = false;
+                autoNote.classList.add("hidden");
+                
+                KELAB_PERSATUAN.forEach(item => {
+                    const current = counts.kelabPersatuan[item] || 0;
+                    const isFull = current >= LIMIT_PER_UNIT;
+                    const opt = document.createElement("option");
+                    opt.value = item;
+                    opt.textContent = `${item} (${current}/${LIMIT_PER_UNIT})${isFull ? ' - PENUH' : ''}`;
+                    opt.disabled = isFull;
+                    kpSelect.appendChild(opt);
+                });
+            }
+
+            // 3. Sukan dan Permainan
+            const spSelect = document.getElementById("sukanPermainan");
+            spSelect.innerHTML = '<option value="" disabled selected>-- Pilih Sukan & Permainan --</option>';
+            SUKAN_PERMAINAN.forEach(item => {
+                const current = counts.sukanPermainan[item] || 0;
+                const isFull = current >= LIMIT_PER_UNIT;
+                const opt = document.createElement("option");
+                opt.value = item;
+                opt.textContent = `${item} (${current}/${LIMIT_PER_UNIT})${isFull ? ' - PENUH' : ''}`;
+                opt.disabled = isFull;
+                spSelect.appendChild(opt);
+            });
+        }
+
+        // Calculate count of each selected unit from storage
+        function getUnitCounts() {
+            const counts = {
+                badanBeruniform: {},
+                kelabPersatuan: {},
+                sukanPermainan: {}
+            };
+
+            registrations.forEach(reg => {
+                counts.badanBeruniform[reg.badanBeruniform] = (counts.badanBeruniform[reg.badanBeruniform] || 0) + 1;
+                counts.kelabPersatuan[reg.kelabPersatuan] = (counts.kelabPersatuan[reg.kelabPersatuan] || 0) + 1;
+                counts.sukanPermainan[reg.sukanPermainan] = (counts.sukanPermainan[reg.sukanPermainan] || 0) + 1;
+            });
+
+            return counts;
+        }
+
+        // --- SUBMISSION HANDLER ---
+        document.getElementById("kokoForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const nama = document.getElementById("nama").value.trim();
+            const noIc = document.getElementById("noIc").value.trim();
+            const kelas = document.getElementById("kelas").value;
+            const badanBeruniform = document.getElementById("badanBeruniform").value;
+            const kelabPersatuan = document.getElementById("kelabPersatuan").value;
+            const sukanPermainan = document.getElementById("sukanPermainan").value;
+
+            if (!badanBeruniform || !kelabPersatuan || !sukanPermainan) {
+                Swal.fire({ icon: 'error', title: 'Pilihan Tidak Lengkap', text: 'Sila pastikan anda memilih satu unit bagi setiap kategori!', confirmColor: '#7f1d1d' });
+                return;
+            }
+
+            // Double check quota limit before saving
+            const counts = getUnitCounts();
+            if ((counts.badanBeruniform[badanBeruniform] || 0) >= LIMIT_PER_UNIT) {
+                Swal.fire({ icon: 'error', title: 'Kuota Penuh', text: `Unit ${badanBeruniform} baru sahaja dipenuhi! Sila pilih unit lain.`, confirmColor: '#7f1d1d' });
+                populateDropdowns(kelas);
+                return;
+            }
+            if ((counts.sukanPermainan[sukanPermainan] || 0) >= LIMIT_PER_UNIT) {
+                Swal.fire({ icon: 'error', title: 'Kuota Penuh', text: `Unit ${sukanPermainan} baru sahaja dipenuhi! Sila pilih unit lain.`, confirmColor: '#7f1d1d' });
+                populateDropdowns(kelas);
+                return;
+            }
+
+            const formData = {
+                nama,
+                noIc,
+                kelas,
+                badanBeruniform,
+                kelabPersatuan,
+                sukanPermainan,
+                timestamp: new Date().toLocaleString('ms-MY')
+            };
+
+            // Save locally for instant quota reflection
+            registrations.push(formData);
+            localStorage.setItem("koko_registrations", JSON.stringify(registrations));
+
+            // Send payload to Google Sheet Web App
+            if (SCRIPT_URL) {
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                }).catch(err => console.log('Error Google Apps Script:', err));
+            }
+
+            // Success Message
+            Swal.fire({
+                icon: 'success',
+                title: 'Pendaftaran Berjaya!',
+                html: `<div class="text-left text-xs space-y-1 bg-amber-50 p-3 rounded border border-yellow-300">
+                    <p><strong>Nama:</strong> ${nama}</p>
+                    <p><strong>No. IC:</strong> ${noIc}</p>
+                    <p><strong>Kelas:</strong> ${kelas}</p>
+                    <p><strong>Badan Beruniform:</strong> ${badanBeruniform}</p>
+                    <p><strong>Kelab/Persatuan:</strong> ${kelabPersatuan}</p>
+                    <p><strong>Sukan/Permainan:</strong> ${sukanPermainan}</p>
+                </div>`,
+                confirmButtonText: 'Selesai',
+                confirmColor: '#7f1d1d'
+            }).then(() => {
+                // Reset form and go back to step 1
+                document.getElementById("kokoForm").reset();
+                document.getElementById("specialClassNotice").classList.add("hidden");
+                goToStep1();
+                renderQuotaOverview();
+            });
+        });
+
+        // --- DASHBOARD OVERVIEW RENDERING ---
+        function renderQuotaOverview() {
+            const container = document.getElementById("quotaContainer");
+            const counts = getUnitCounts();
+
+            let bbHtml = '<div class="space-y-1"><strong class="text-red-950 block border-b border-amber-200 pb-1">Badan Beruniform</strong>';
+            BADAN_BERUNIFORM.forEach(item => {
+                const c = counts.badanBeruniform[item] || 0;
+                bbHtml += `<div class="flex justify-between"><span>${item}</span><span class="${c >= LIMIT_PER_UNIT ? 'text-red-600 font-bold' : 'text-slate-500'}">${c}/${LIMIT_PER_UNIT}</span></div>`;
+            });
+            bbHtml += '</div>';
+
+            let kpHtml = '<div class="space-y-1"><strong class="text-red-950 block border-b border-amber-200 pb-1">Kelab & Persatuan</strong>';
+            KELAB_PERSATUAN.forEach(item => {
+                const c = counts.kelabPersatuan[item] || 0;
+                kpHtml += `<div class="flex justify-between"><span>${item}</span><span class="${c >= LIMIT_PER_UNIT ? 'text-red-600 font-bold' : 'text-slate-500'}">${c}/${LIMIT_PER_UNIT}</span></div>`;
+            });
+            kpHtml += '</div>';
+
+            let spHtml = '<div class="space-y-1"><strong class="text-red-950 block border-b border-amber-200 pb-1">Sukan & Permainan</strong>';
+            SUKAN_PERMAINAN.forEach(item => {
+                const c = counts.sukanPermainan[item] || 0;
+                spHtml += `<div class="flex justify-between"><span>${item}</span><span class="${c >= LIMIT_PER_UNIT ? 'text-red-600 font-bold' : 'text-slate-500'}">${c}/${LIMIT_PER_UNIT}</span></div>`;
+            });
+            spHtml += '</div>';
+
+            container.innerHTML = bbHtml + kpHtml + spHtml;
+        }
+
+        function resetData() {
+            if (confirm("Adakah anda pasti untuk memadam semua rekod pendaftaran dalam storan tempatan?")) {
+                localStorage.removeItem("koko_registrations");
+                registrations = [];
+                renderQuotaOverview();
+                alert("Data tempatan telah dikosongkan.");
+            }
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle("hidden");
+        }
+    </script>
+</body>
+</html>
